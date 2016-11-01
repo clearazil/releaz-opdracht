@@ -26,6 +26,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    public $password_repeat;
+
 
     /**
      * @inheritdoc
@@ -45,12 +47,26 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    public function scenarios()
+    {
+        return [
+            'create' => ['password_hash', 'password_repeat', 'username', 'email'],
+            'update' => ['password_hash', 'password_repeat', 'username', 'email'],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
+            [['username', 'email'], 'required'],
+            [['password_repeat'], 'required', 'on' => 'create'],
+            [['password_hash'], 'required', 'on' => 'create'],
+            [['username', 'email'], 'unique'],
+            ['password_hash', 'compare', 'compareAttribute' => 'password_repeat'],
+            [['password_hash'], 'string', 'min' => 8],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
         ];

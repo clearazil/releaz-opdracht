@@ -35,6 +35,10 @@ class UsersController extends Controller
      */
     public function actionIndex()
     {
+        if (! Yii::$app->user->can('viewUsers')) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         $dataProvider = new ActiveDataProvider([
             'query' => User::find(),
         ]);
@@ -51,8 +55,16 @@ class UsersController extends Controller
      */
     public function actionView($id)
     {
+        $roles = Yii::$app->authManager->getRolesByUser(Yii::$app->user->getId());
+
+        $user = $this->findModel($id);
+
+        if (! Yii::$app->user->can('viewUser', ['user' => $user])) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $user,
         ]);
     }
 
@@ -63,6 +75,10 @@ class UsersController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can('createUser')) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         $request = Yii::$app->request;
 
         $model = new User(['scenario' => 'create']);
@@ -95,6 +111,11 @@ class UsersController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        if (! Yii::$app->user->can('updateUser', ['user' => $model])) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         $model->setScenario('update');
         $oldPassword = $model->password_hash;
         $request = Yii::$app->request;
@@ -128,7 +149,13 @@ class UsersController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if (! Yii::$app->user->can('deleteUser', ['user' => $model])) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }

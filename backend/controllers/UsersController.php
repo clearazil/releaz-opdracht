@@ -55,8 +55,6 @@ class UsersController extends Controller
      */
     public function actionView($id)
     {
-        $roles = Yii::$app->authManager->getRolesByUser(Yii::$app->user->getId());
-
         $user = $this->findModel($id);
 
         if (! Yii::$app->user->can('viewUser', ['user' => $user])) {

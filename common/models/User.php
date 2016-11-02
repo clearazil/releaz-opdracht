@@ -72,6 +72,11 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    public function getActivities()
+    {
+        return $this->hasMany(Activity::className(), ['user_id' => 'id']);
+    }
+
     /**
      * @inheritdoc
      */

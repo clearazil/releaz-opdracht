@@ -60,4 +60,10 @@ class Category extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ActivityCategory::className(), ['category_id' => 'id']);
     }
+
+    public function getActivities()
+    {
+        return $this->hasMany(Activity::className(), ['id' => 'activity_id'])
+            ->viaTable('activity_category', ['category_id' => 'id']);
+    }
 }
